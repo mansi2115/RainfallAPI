@@ -68,7 +68,7 @@ public class RainfallApiController {
 	@GetMapping(value = "/getMonthlyAvgByCity")
 	public ResponseEntity<RequestResponse> getMonthlyAvgByCity(@RequestParam String month,@RequestParam String city,@RequestParam String units)
 	{
-		RequestResponse result = new RequestResponse(true," Average of "+city+" for "+month+" :"+service.getMonthlyAvgByCity(month, city, units), HttpStatus.OK.getReasonPhrase());
+		RequestResponse result = new RequestResponse(true,service.getMonthlyAvgByCity(month, city, units), HttpStatus.OK.getReasonPhrase());
 		return new ResponseEntity<RequestResponse>(result, HttpStatus.OK);
 
 	}

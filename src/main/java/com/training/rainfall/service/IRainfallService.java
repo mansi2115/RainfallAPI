@@ -15,7 +15,7 @@ public interface IRainfallService {
 	List<City> getCities();
 	List<Rainfall> getRainfallByCity(String cityName);
 	
-	boolean deleteCity(String cityName);
+	String deleteCity(String cityName);
 	String deleteRainfall(String cityName, String month);
 	
 	double getMonthlyAvgByCity(String month,String city,String units);

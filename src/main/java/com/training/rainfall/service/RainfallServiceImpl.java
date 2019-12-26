@@ -1,5 +1,6 @@
 package com.training.rainfall.service;
 
+
 import java.util.List;
 import java.util.Random;
 
@@ -23,6 +24,8 @@ public class RainfallServiceImpl implements IRainfallService{
 	@Autowired
 	ICityDao cityDao;
 	
+	
+	
 	@Override
 	public City setCity(City city) {
 		if(cityDao.findByCityName(city.getCityName())!=null) {
@@ -41,19 +44,15 @@ public class RainfallServiceImpl implements IRainfallService{
 	@Override
 	public Rainfall setRainfall(Rainfall rainfall) {
 		City city= cityDao.findByCityName(rainfall.getCity().getCityName());
-		System.out.println(city);
-		//System.out.println();
-		//try {
-			//int id=rainfallDao.findidRainfall(city.getCityId(),rainfall.getMonth());
-		//System.out.println(rainfallDao.findidRainfall(city.getCityId(),rainfall.getMonth()));
-//		if(rainfallDao.existsById()) {
-//			throw new InvalidInputException("already exist ");
-//		}
-//		else
-//		{
+		if(city == null) {
+        	throw new InvalidInputException("City does not exist. Please add city first.");
+        }
+		Rainfall rain = rainfallDao.findRainfall(rainfall.getMonth(), city.getCityId());
+		if(rain!=null) {
+        	throw new InvalidInputException("Already exists");
+        }
 			rainfall.setCity(city);
 			return rainfallDao.save(rainfall);
-	//	}
 	}
 	
 	@Override
@@ -63,31 +62,47 @@ public class RainfallServiceImpl implements IRainfallService{
 	}
 
 	@Override
-	public double getMonthlyAvgByCity(String month, String city, String units) {
-		double avg;
-		if(units.equalsIgnoreCase("mm")) {
-			avg = rainfallDao.findMonthlyAvgRainfallByCity(month, cityDao.findByCityName(city).getCityId());
-			return avg;
-		}
-		else if(units.equalsIgnoreCase("cm")) {
-			avg = rainfallDao.findMonthlyAvgRainfallByCity(month, cityDao.findByCityName(city).getCityId());
-			return convertToCm(avg);
-		}
+	public double getMonthlyAvgByCity(String month, String cityName, String units) {
+		
+		City city=cityDao.findByCityName(cityName);
+
+		if(city == null) {
+        	throw new InvalidInputException("City does not exist");
+        }
+		Rainfall rain = rainfallDao.findRainfall(month, city.getCityId());
+		if(rain==null) {
+        	throw new InvalidInputException("Given Rainfall is Not Found");
+        }
 		else {
-			 throw new InvalidInputException("Invalid unit");
+			if(units.equalsIgnoreCase("mm")) {
+				
+				return rain.getRain();
+			}
+			else if(units.equalsIgnoreCase("cm")) {
+				return convertToCm(rain.getRain());
+			}
+			else {
+				 throw new InvalidInputException("Invalid unit");
+			}
+			
 		}
 		
 	}
 
 	@Override
-	public double getYearlyAvgByCity(String city, String units) {
+	public double getYearlyAvgByCity(String cityName, String units) {
 		double avg;
+		City city=cityDao.findByCityName(cityName);
+		if(city == null) {
+        	throw new InvalidInputException("City does not exist");
+        }
+		avg=rainfallDao.findYearlyAvgRainfallByCity(city.getCityId());
 		if(units.equalsIgnoreCase("mm")) {
-			avg = rainfallDao.findYearlyAvgRainfallByCity(cityDao.findByCityName(city).getCityId());
+			
 			return avg;
 		}
 		else if(units.equalsIgnoreCase("cm")) {
-			avg = rainfallDao.findYearlyAvgRainfallByCity(cityDao.findByCityName(city).getCityId());
+
 			return convertToCm(avg);
 		}
 		else {
@@ -103,45 +118,65 @@ public class RainfallServiceImpl implements IRainfallService{
 
 	@Override
 	public List<Rainfall> getRainfallByCity(String cityName) {
-		int id=cityDao.findByCityName(cityName).getCityId();
-		List<Rainfall> rain=rainfallDao.findRainfallByCity(id);
+		City city=cityDao.findByCityName(cityName);
+		if(city == null) {
+        	throw new InvalidInputException("City does not exist");
+        }
+		List<Rainfall> rain=rainfallDao.findRainfallByCity(city.getCityId());
 		return rain;	
 	}
 
 	@Override
-	public boolean deleteCity(String cityName) {
-		int id=cityDao.findByCityName(cityName).getCityId();
-		cityDao.deleteById(id);
-		if(cityDao.existsById(id)) {
-			return false;
-		}
-		else {
-			return true;
-		}
+	public String deleteCity(String cityName) {
+		City city=cityDao.findByCityName(cityName);
+		
+        if(city == null) {
+        	throw new InvalidInputException("City does not exist");
+        }
+        else {
+        	cityDao.delete(city);
+        	return "Deleted Succefully";
+        }
+        
 		
 	}
 	
 	@Override
     public String deleteRainfall(String cityName,String month) {
-        int id=cityDao.findByCityName(cityName).getCityId();
-        int rainid=rainfallDao.findidRainfall(id, month);
-        rainfallDao.deleteById(rainid);
-        if(rainfallDao.existsById(rainid)) {
-            return "Not Deleted";
+        City city=cityDao.findByCityName(cityName);
+        if(city == null) {
+        	throw new InvalidInputException("City does not exist");
+        }
+        Rainfall rain=rainfallDao.findRainfall(month,city.getCityId());
+        if(rain==null) {
+        	throw new InvalidInputException("Given Rainfall is Not Found");
         }
         else {
-            return "Deleted";
+        	rainfallDao.delete(rain);
+        	return "Deleted Succefully";
         }
-    
+        
     }
 	
 	 @Override
 	    public String updateRainfall(String cityName, String month, double rain) {
-	        int id=cityDao.findByCityName(cityName).getCityId();
-	        
-	         rainfallDao.updateRainfall(rain, id, month);
-	        return "updated";
-	    }
+	        City city=cityDao.findByCityName(cityName);
+	        if(city == null) {
+	        	throw new InvalidInputException("City does not exist");
+	        }
+	        else if(rainfallDao.findRainfall(month,city.getCityId())==null) {
+	        	throw new InvalidInputException("Given rainfall does not exist");
+
+	        }
+	        else {
+	        	 int i=   rainfallDao.updateRainfall(rain,city.getCityId(), month);
+	    	     if(i==1) {
+	    	    	 return "Updated Succesfully";
+	    	     }
+	 	        
+	    	     return "Updation failed. Please check your data";
+	        }
+	        }
 
 	
 	
