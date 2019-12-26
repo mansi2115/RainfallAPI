@@ -1,5 +1,6 @@
 package com.training.rainfall.entities;
 
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,23 +10,25 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name="City",uniqueConstraints=@UniqueConstraint(columnNames={"city_name"}))
+@Table(name="City",uniqueConstraints=@UniqueConstraint(columnNames={"longitude","latitude"}))
 public class City {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name="city_id")
 	private int cityId;
 	
-	@Column(name="city_name")
+	@Column(name="city_name", unique=true)
 	private String cityName;
-
+	
+	private double longitude;
+	private double latitude;
+	
 	/**
 	 * default constructor
 	 */
 	public City() {
 		super();
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	/**
@@ -54,6 +57,34 @@ public class City {
 	 */
 	public void setCityName(String cityName) {
 		this.cityName = cityName;
+	}
+
+	/**
+	 * @return the longitude
+	 */
+	public double getLongitude() {
+		return longitude;
+	}
+
+	/**
+	 * @param longitude the longitude to set
+	 */
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	/**
+	 * @return the latitude
+	 */
+	public double getLatitude() {
+		return latitude;
+	}
+
+	/**
+	 * @param latitude the latitude to set
+	 */
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
 	}
 	
 	

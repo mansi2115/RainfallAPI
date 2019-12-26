@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.training.rainfall.entities.City;
 import com.training.rainfall.entities.Rainfall;
+import com.training.rainfall.exception.RequestResponse;
 import com.training.rainfall.service.IRainfallService;
 
 @RestController
@@ -25,7 +27,7 @@ public class RainfallApiController {
 	IRainfallService service;
 
 	// add city
-	@PostMapping(value = "/setCity")
+	@PostMapping(value = "/city")
 	public ResponseEntity<Object> setCity(@RequestBody City city) {
 
 		return new ResponseEntity<Object>(service.setCity(city), HttpStatus.OK);
@@ -33,7 +35,7 @@ public class RainfallApiController {
 	}
 
 	// add rainfall
-	@PostMapping(value = "/setRainfall")
+	@PostMapping(value = "/rainfall")
 	public ResponseEntity<Object> setRainfall(@RequestBody Rainfall rainfall) {
 
 		return new ResponseEntity<Object>(service.setRainfall(rainfall), HttpStatus.OK);
@@ -42,44 +44,63 @@ public class RainfallApiController {
 	/*
 	 * get all cities
 	 */
-	@GetMapping(value = "/getCities")
-	public ResponseEntity<Object> getCities() {
+	@GetMapping(value = "/city")
+	public ResponseEntity<RequestResponse> getCities() {
 
 		List<City> cities=service.getCities();
-		return new ResponseEntity<Object>(cities, HttpStatus.OK);
+		RequestResponse result = new RequestResponse(true,cities, HttpStatus.OK.getReasonPhrase());
+		return new ResponseEntity<RequestResponse>(result,HttpStatus.OK);
 
 	}
 	/*
 	 * get rainfall of given city for all months
 	 */
-	@GetMapping(value = "/getRainfallByCity")
-	public ResponseEntity<Object> getRainfallByCity(@RequestParam("city") String city) {
+	@GetMapping(value = "/rainfall")
+	public ResponseEntity<RequestResponse> getRainfallByCity(@RequestParam("city") String city) {
 
 		List<Rainfall> rain=service.getRainfallByCity(city);
-		return new ResponseEntity<Object>(rain, HttpStatus.OK);
+		RequestResponse result = new RequestResponse(true,rain, HttpStatus.OK.getReasonPhrase());
+		return new ResponseEntity<RequestResponse>(result, HttpStatus.OK);
 
 	}
 	
 	
 	@GetMapping(value = "/getMonthlyAvgByCity")
-	public ResponseEntity<Object> getMonthlyAvgByCity(@RequestParam String month,@RequestParam String city,@RequestParam String units)
+	public ResponseEntity<RequestResponse> getMonthlyAvgByCity(@RequestParam String month,@RequestParam String city,@RequestParam String units)
 	{
-		return new ResponseEntity<Object>(month+" Average of "+city+" :"+service.getMonthlyAvgByCity(month, city, units), HttpStatus.OK);
+		RequestResponse result = new RequestResponse(true," Average of "+city+" for "+month+" :"+service.getMonthlyAvgByCity(month, city, units), HttpStatus.OK.getReasonPhrase());
+		return new ResponseEntity<RequestResponse>(result, HttpStatus.OK);
 
 	}
 	
 	@GetMapping(value = "/getYearlyAvgByCity")
 	public ResponseEntity<Object> getYearlyAvgByCity(@RequestParam String city,@RequestParam String units)
 	{
-		return new ResponseEntity<Object>("Yearly Average of "+city+" :"+service.getYearlyAvgByCity(city, units), HttpStatus.OK);
+		RequestResponse result = new RequestResponse(true,"Yearly Average of "+city+" :"+service.getYearlyAvgByCity(city, units), HttpStatus.OK.getReasonPhrase());
+
+		return new ResponseEntity<Object>(result, HttpStatus.OK);
 
 	}
 	
-	@DeleteMapping(value = "/deleteCity")
+	@DeleteMapping(value = "/city")
 	public ResponseEntity<Object> deleteCity(@RequestParam String city)
 	{
-		return new ResponseEntity<Object>(service.deleteCity(city), HttpStatus.OK);
+		RequestResponse result = new RequestResponse(true,service.deleteCity(city), HttpStatus.OK.getReasonPhrase());
+
+		return new ResponseEntity<Object>(result, HttpStatus.OK);
 	}
+	
+	@DeleteMapping(value = "/rainfall")
+    public ResponseEntity<Object> deleteRainfall(@RequestParam String city,@RequestParam String month)
+    {
+        return new ResponseEntity<Object>(service.deleteRainfall(city, month), HttpStatus.OK);
+    }
+   
+    @PutMapping(value = "/rainfall")
+    public ResponseEntity<Object> updateRainfall(@RequestParam String city,@RequestParam String month,@RequestParam double rain)
+    {
+        return new ResponseEntity<Object>(service.updateRainfall(city, month, rain), HttpStatus.OK);
+    }
 	
 
 }

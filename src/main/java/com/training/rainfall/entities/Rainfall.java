@@ -18,8 +18,8 @@ import javax.persistence.*;
 public class Rainfall {
 
 	@Id
-	@SequenceGenerator(name = "rainfall_id", initialValue = 1, sequenceName = "rainfallSeq", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rainfall_id")
+	//@SequenceGenerator(name = "rainfall_id", initialValue = 1, sequenceName = "rainfallSeq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	
 	@Column(name="month")

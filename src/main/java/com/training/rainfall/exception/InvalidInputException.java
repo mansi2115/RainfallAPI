@@ -1,6 +1,6 @@
 package com.training.rainfall.exception;
 
-public class InvalidUnitException extends RuntimeException{
+public class InvalidInputException extends RuntimeException{
 
 	/**
 	 * 
@@ -10,7 +10,7 @@ public class InvalidUnitException extends RuntimeException{
 	/**
 	 * 
 	 */
-	public InvalidUnitException() {
+	public InvalidInputException() {
 		super();
 	
 	}
@@ -18,7 +18,7 @@ public class InvalidUnitException extends RuntimeException{
 	/**
 	 * @param message
 	 */
-	public InvalidUnitException(String message) {
+	public InvalidInputException(String message) {
 		super(message);
 	
 	}
